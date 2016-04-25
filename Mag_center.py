@@ -28,17 +28,17 @@ for i in range(99):
 #second corner
 for i in range(99):
     for j in range(99):
-        sum += image[len(image)-i][j]
+        sum += image[len(image)-i-1][j]
         n += 1
 #thrid corner
 for i in range(99):
     for j in range(99):
-        sum += image[i][len(image)-j]
+        sum += image[i][len(image)-j-1]
         n += 1
 #fourth corner
 for i in range(99):
     for j in range(99):
-        sum += image[len(image)-i][len(image)-j]
+        sum += image[len(image)-i-1][len(image)-j-1]
         n += 1
 
 mu = sum/n
@@ -51,24 +51,27 @@ for i in range(99):
 #second corner
 for i in range(99):
     for j in range(99):
-        sum += (image[len(image)-i][j] - mu)**2
+        sum += (image[len(image)-i-1][j] - mu)**2
 #thrid corner
 for i in range(99):
     for j in range(99):
-        sum += (image[i][len(image)-j] - mu)**2
+        sum += (image[i][len(image)-j-1] - mu)**2
 #fourth corner
 for i in range(99):
     for j in range(99):
-        sum += (image[len(image)-i][len(image)-j] - mu)**2
+        sum += (image[len(image)-i-1][len(image)-j-1] - mu)**2
 
 sigma2 = sum/(n-1)
 sigma = sigma2**(0.5)
 threshold = 5*sigma
+print threshold
 
 from photutils import daofind
 from astropy.stats import mad_std
 bkg_sigma = mad_std(image)
-sources = daofind(image, fwhm, threshold*bkg_sigma)
+#print bkg_sigma
+#bkg_sigma = 2
+sources = daofind(image, threshold*bkg_sigma, fwhm)
 
 sources_2 = np.array(sources["id", "xcentroid", "ycentroid", "sharpness", "roundness1", "roundness2", "npix", "sky", "peak", "flux", "mag"])
 print_line= (file_name+","+str(sources_2))
