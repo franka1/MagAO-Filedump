@@ -5,8 +5,9 @@
 from astropy.io import fits
 import numpy as np
 import sys
+import os
 
-def calc_threshold(corner_width,corner_height):
+def calc_threshold(image, corner_width, corner_height):
     sum = 0.0
     n = 0
     #first corner
@@ -64,10 +65,13 @@ def main():
     corner_width = int(sys.argv[6])
     corner_height = int(sys.argv[7])
 
+    file_names = os.listdir(inpath)
+    for file_name in file_names:
+
     hdulist = fits.open(inpath + file_name)
     image = hdulist[0].data
 
-    threshold = calc_threshold(corner_width,corner_height)
+    threshold = calc_threshold(image, corner_width, corner_height)
 
     from photutils import daofind
     from astropy.stats import mad_std
@@ -77,6 +81,7 @@ def main():
     sources_2 = np.array(sources["id", "xcentroid", "ycentroid", "sharpness", "roundness1", "roundness2", "npix", "sky", "peak", "flux", "mag"])
     print_line= (file_name+","+str(sources_2))
     file= open(outpath, "a")
+    file.write("\n")
     file.write(print_line)
     file.close()
 
@@ -97,4 +102,5 @@ def main():
     apertures.plot(color='blue', lw=1.5, alpha=0.5)
     plt.show()
 
-main
+if __name__ == "__main__":
+	main()
