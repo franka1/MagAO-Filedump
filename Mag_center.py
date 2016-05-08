@@ -78,7 +78,8 @@ def process_file(inpath, file_name, t_constant, sigma, fwhm, r, kernel_size, out
 
     sources_2 = np.array(sources["id", "xcentroid", "ycentroid", "sharpness", "roundness1", "roundness2", "npix", "sky", "peak", "flux", "mag"])
     print_line= (file_name+","+str(sources_2))
-    file= open(outpath + file_name + ".out", "a")
+    base_name = os.path.splitext(file_name)[0]
+    file = open(outpath + base_name + ".out", "a")
     file.write(print_line)
     file.close()
 
@@ -88,13 +89,13 @@ def process_file(inpath, file_name, t_constant, sigma, fwhm, r, kernel_size, out
     phot_table = aperture_photometry(median_sub, apertures)
     phot_table_2 = np.array(phot_table["aperture_sum", "xcenter", "ycenter"])
     print_line= (","+str(phot_table_2)+"\n")
-    file= open(outpath + file_name + ".out", "a")
+    file = open(outpath + base_name + ".out", "a")
     file.write(print_line)
     file.write("\n")
     file.close()
 
     hdulist[0].data = median_sub
-    file = open(outpath + file_name + ".fits", "w")
+    file = open(outpath + base_name + ".fits", "w")
     hdulist.writeto(file)
     file.close()
 
@@ -120,8 +121,7 @@ def main():
     parser.add_argument('-k','--kernel', type=int, default=17, help='Specifies kernel size for median filter. (default: 17)')
     parser.add_argument('-p','--plot', action='store_true', help='Show plotted stars after for each image')
 
-    args = parser.parse_args();
-#    print args
+    args = parser.parse_args()
 
     if args.sigma:
         sigma = args.sigma
