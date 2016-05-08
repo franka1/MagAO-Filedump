@@ -1,6 +1,5 @@
-# Author: Jennifer Vezilj
-# Editor: Alex Frank
-# This is a cleaned copy of clio_sub.py
+# Author: Alex Frank
+# Contributor: Jennifer Vezilj
 
 from astropy.io import fits
 import numpy as np
@@ -115,7 +114,7 @@ def main():
     parser.add_argument('-r','--radius', type=int, default=12, help='Specifies radius of stars in image. (default:12)')
     parser.add_argument('-t','--threshold', type=int, default=1,
                         help='Specifies the threshold constant to be used in concert with sigma. (default: 1)')
-    parser.add_argument('-s','--calc_sigma', nargs=2, default=[100,100], metavar=('CORNER_WIDTH','CORNER_HEIGHT'),
+    parser.add_argument('-s','--calc_sigma', nargs=2, metavar=('CORNER_WIDTH','CORNER_HEIGHT'),
                         help='Calculate sigma using specified corner width and height.')
     parser.add_argument('-S','--sigma', type=float, help='Use the supplied sigma value.')
     parser.add_argument('-k','--kernel', type=int, default=17, help='Specifies kernel size for median filter. (default: 17)')
