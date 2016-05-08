@@ -6,6 +6,7 @@ from astropy.io import fits
 import numpy as np
 import sys
 import os
+from scipy import signal
 from photutils import daofind
 from astropy.stats import mad_std
 from photutils import aperture_photometry, CircularAperture
@@ -57,7 +58,7 @@ def calc_threshold(image, corner_width, corner_height):
 
     sigma2 = sum/(n-1)
     sigma = sigma2**(0.5)
-    threshold = 5*sigma
+    threshold = 30*sigma
     return threshold
 
 
@@ -65,30 +66,40 @@ def process_file(inpath, file_name, corner_width, corner_height, fwhm, r, outpat
     hdulist = fits.open(inpath + file_name)
     image = hdulist[0].data
 
-    threshold = calc_threshold(image, corner_width, corner_height)
+#    threshold = calc_threshold(image, corner_width, corner_height)
+    threshold = 115
+#    print "Threshold = "
+#    print threshold
 
-    bkg_sigma = mad_std(image)
-    sources = daofind(image, threshold*bkg_sigma, fwhm)
+#    bkg_sigma = mad_std(image)
+    median_out = signal.medfilt(image,17)
+    median_sub = np.subtract(image,median_out)
+    sources = daofind(median_sub, threshold, fwhm)
 
     sources_2 = np.array(sources["id", "xcentroid", "ycentroid", "sharpness", "roundness1", "roundness2", "npix", "sky", "peak", "flux", "mag"])
     print_line= (file_name+","+str(sources_2))
-    file= open(outpath, "a")
-    file.write("\n")
-    file.write(print_line)
-    file.close()
+#    file= open(outpath, "a")
+#    file.write("\n")
+#    file.write(print_line)
+#    file.close()
 
     positions = (sources['xcentroid'], sources['ycentroid'])
-    print positions
+#    print positions
     apertures = CircularAperture(positions, r)
-    phot_table = aperture_photometry(image, apertures)
+    phot_table = aperture_photometry(median_sub, apertures)
     phot_table_2 = np.array(phot_table["aperture_sum", "xcenter", "ycenter"])
     print_line= (","+str(phot_table_2)+"\n")
-    file= open(outpath, "a")
-    file.write(print_line)
+#    file= open(outpath, "a")
+#    file.write(print_line)
+#    file.close()
+
+    hdulist[0].data = median_sub
+    file = open(outpath, "w")
+    hdulist.writeto(file)
     file.close()
 
-    image[image<=0]=0.0001
-    plt.imshow(image, cmap='gray', origin='lower')
+    median_sub[median_sub<=0]=0.0001
+    plt.imshow(median_sub, cmap='gray', origin='lower')
     apertures.plot(color='blue', lw=1.5, alpha=0.5)
     plt.show()
 
