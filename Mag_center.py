@@ -63,6 +63,7 @@ def calc_sigma(image, corner_width, corner_height):
 
 
 def process_file(inpath, file_name, t_constant, sigma, fwhm, r, kernel_size, outpath, plot):
+    print "Processing " + file_name
     hdulist = fits.open(inpath + file_name)
     image = hdulist[0].data
 
@@ -87,7 +88,7 @@ def process_file(inpath, file_name, t_constant, sigma, fwhm, r, kernel_size, out
     phot_table = aperture_photometry(median_sub, apertures)
     phot_table_2 = np.array(phot_table["aperture_sum", "xcenter", "ycenter"])
     print_line= (","+str(phot_table_2)+"\n")
-    file= open(outpath, + file_name + ".out", "a")
+    file= open(outpath + file_name + ".out", "a")
     file.write(print_line)
     file.write("\n")
     file.close()
@@ -106,28 +107,26 @@ def process_file(inpath, file_name, t_constant, sigma, fwhm, r, kernel_size, out
 
 def main():
     parser = argparse.ArgumentParser(description='Find stars in an image.')
-    parser.add_argument('-i','--input', required=True,
+    parser.add_argument('-i','--input', type=str, required=True,
                         help='The path to input file or directory. Trailing / is require for directories.')
-    parser.add_argument('-o','--output', required=True, help='The path to output directory.')
-    parser.add_argument('-f','--fwhm', default=4.7, help='Specifies fwhm.')
-    parser.add_argument('-r','--radius', default=12, help='Specifies radius of stars in image.')
-    parser.add_argument('-t','--threshold', default=1,
-                        help='Specifies the threshold constant to be used in concert with sigma.')
+    parser.add_argument('-o','--output', type=str, required=True, help='The path to output directory.')
+    parser.add_argument('-f','--fwhm', type=float, default=4.7, help='Specifies fwhm. (default: 4.7)')
+    parser.add_argument('-r','--radius', type=int, default=12, help='Specifies radius of stars in image. (default:12)')
+    parser.add_argument('-t','--threshold', type=int, default=1,
+                        help='Specifies the threshold constant to be used in concert with sigma. (default: 1)')
     parser.add_argument('-s','--calc_sigma', nargs=2, default=[100,100], metavar=('CORNER_WIDTH','CORNER_HEIGHT'),
                         help='Calculate sigma using specified corner width and height.')
-    parser.add_argument('-S','--sigma', help='Use the supplied sigma value.')
-    parser.add_argument('-k','--kernel', default=17, help='Specifies kernel size for median filter.')
+    parser.add_argument('-S','--sigma', type=float, help='Use the supplied sigma value.')
+    parser.add_argument('-k','--kernel', type=int, default=17, help='Specifies kernel size for median filter. (default: 17)')
     parser.add_argument('-p','--plot', action='store_true', help='Show plotted stars after for each image')
 
     args = parser.parse_args();
-    print args
+#    print args
 
     if args.sigma:
         sigma = args.sigma
     else:
-        sigma = [args.calc_sigma[0],args.calc_sigma[1]]
-
-    print sigma
+        sigma = [int(args.calc_sigma[0]),int(args.calc_sigma[1])]
 
     if os.path.isdir(args.input):
         file_names = os.listdir(args.input)
