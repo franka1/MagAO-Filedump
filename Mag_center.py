@@ -108,7 +108,7 @@ def process_file(inpath, file_name, t_constant, sigma, fwhm, r, kernel_size, out
 def main():
     parser = argparse.ArgumentParser(description='Find stars in an image.')
     parser.add_argument('-i','--input', type=str, required=True,
-                        help='The path to input file or directory. Trailing / is require for directories.')
+                        help='The path to input file or directory. Trailing / is required for directories.')
     parser.add_argument('-o','--output', type=str, required=True, help='The path to output directory.')
     parser.add_argument('-f','--fwhm', type=float, default=4.7, help='Specifies fwhm. (default: 4.7)')
     parser.add_argument('-r','--radius', type=int, default=12, help='Specifies radius of stars in image. (default:12)')
